@@ -2,8 +2,10 @@
 import 'reflect-metadata';  // MUST be first import for TypeORM decorators!
 import express from 'express';
 import cors from 'cors';
-import { AppDataSource } from './config/data-source';
+import AppDataSource from './config/data-source';
 import { userRoutes } from './routes/userRoutes';
+import { taskRoutes } from './routes/taskRoutes';
+
 import * as dotenv from 'dotenv';
 
 dotenv.config();
@@ -26,6 +28,7 @@ app.get('/health', (req, res) => {
 
 // Routes
 app.use('/api/users', userRoutes);
+ app.use('/api', taskRoutes);
 
 // 404 handler
 app.use((req, res) => {
@@ -42,12 +45,15 @@ app.use((req, res) => {
 AppDataSource.initialize()
     .then(() => {
         console.log('✅ Database connected successfully!');
+        console.log(AppDataSource.isInitialized);  // true/false
+        console.log(AppDataSource.entityMetadatas);  
+
+        // Routes
+        app.use ('/api/users', userRoutes);
 
         // Start server
         app.listen(PORT, () => {
             console.log(`🚀 Server running on http://localhost:${PORT}`);
-            console.log(`💚 Health check: http://localhost:${PORT}/health`);
-            console.log(`👥 Users API: http://localhost:${PORT}/api/users`);
         });
     })
     .catch((error) => {

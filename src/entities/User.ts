@@ -4,10 +4,15 @@ import {
     PrimaryGeneratedColumn,
     Column,
     CreateDateColumn,
-    UpdateDateColumn
+    UpdateDateColumn,
+    OneToMany,
+    Index
 } from 'typeorm';
 
-@Entity('users') // Maps to 'users' tablein MySQL
+import { Task } from './Task';
+
+@Entity('users') 
+@Index (['email'], { unique: true } )
 export class User {
 
     @PrimaryGeneratedColumn()
@@ -19,11 +24,18 @@ export class User {
     @Column({ type: 'varchar', unique: true, length: 100 })
     email!: string;
 
+    @Column({ type: 'varchar', length: 20, nullable: true })
+    phoneNumber!: string | null;
+
+
     @Column({ type: 'varchar', length: 255, select: false})
     password!: string;
 
     @Column({ type: 'boolean', default: true })
     isActive!: boolean;
+
+    @OneToMany ( () => Task, task => task.user )
+    tasks!: Task[];
 
     @CreateDateColumn()
     createdAt!: Date;
